@@ -20,6 +20,9 @@ importers:
       langchain:
         specifier: ^1.5.2
         version: 1.5.2(@langchain/core@1.2.1(ws@8.21.0))(ws@8.21.0)
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
 
 packages:
 
