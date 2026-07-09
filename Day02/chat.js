@@ -17,6 +17,10 @@ async function main() {
   const prompt = ChatPromptTemplate.fromTemplate(`
     You are a {field} teacher who specialised in teaching {subjects}
     `)
+  const promptMessage = ChatPromptTemplate.fromMessages([
+    ["system","You are a {field} teacher who specialised in teaching {subjects}"],
+    ["human","Array methods in JavaScript"]
+  ])
   // :One-way of passing variables
   const formatedPrompt = await prompt.formatMessages({
     field:"computer science",
@@ -26,7 +30,9 @@ async function main() {
   //Better Version
   const chain = prompt.pipe(model)
 
-  const res = await chain.invoke({
+  const chainMessage = promptMessage.pipe(model)
+
+  const res = await chainMessage.invoke({
     field:"computer science",
     subjects:"programming"
   })
