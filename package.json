@@ -1,0 +1,16 @@
+{
+  "name": "foo",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "node"
+  },
+  "packageManager": "pnpm@10.33.2",
+  "dependencies": {
+    "@langchain/core": "^1.2.1",
+    "@langchain/mistralai": "^1.2.0",
+    "dotenv": "^17.4.2",
+    "langchain": "^1.5.2"
+  }
+}
