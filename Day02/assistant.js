@@ -24,9 +24,6 @@ async function assistant(){
   })
   console.log(res.content);
 
-
-
-
 }
 
 await assistant();

@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 const Config = {
-  apiKey: process.env.MISTRALAI_API_KEY,
+  apiKey: process.env.MISTRAL_API_KEY || process.env.MISTRALAI_API_KEY,
   temperature: process.env.TEMPERATURE,
 };
 
