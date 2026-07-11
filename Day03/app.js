@@ -27,10 +27,10 @@ Generate a product listing.`,
   [
     "human",
     `Product: {product}
-Category: {category}
-Audience: {audience}
+     Category: {category}
+     Audience: {audience}
 
-{formatInstructions}`,
+    {formatInstructions}`,
   ],
 ]);
 
@@ -48,8 +48,17 @@ export async function askAgent() {
     formatInstructions,
   });
 
-  const response = await model.invoke(formattedMessages);
-  const result = await parser.parse(response.content);
+  // const response = await model.invoke(formattedMessages);
+  // const result = await parser.parse(response.content);
+  // console.log(result);
+
+  const chain = prompt.pipe(model).pipe(parser);
+  const result = await chain.invoke({
+    product: input.productName,
+    category: input.category,
+    audience: input.audience,
+    formatInstructions,
+  });
   console.log(result);
 }
 
