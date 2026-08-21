@@ -10,6 +10,7 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
 const Config = {
   apiKey: process.env.MISTRAL_API_KEY || process.env.MISTRALAI_API_KEY,
   temperature: process.env.TEMPERATURE,
+  llm: process.env.LLM_MODEL || "mistral-small-2603",
 };
 
 export default Config;

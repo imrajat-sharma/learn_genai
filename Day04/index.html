@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Quiz Generator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #0f172a, #111827);
+      color: #f9fafb;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .quiz-card {
+      width: min(92vw, 520px);
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #d1d5db;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+    }
+
+    .controls input,
+    .controls select,
+    .controls button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #374151;
+      background: #111827;
+      color: white;
+    }
+
+    .controls button {
+      cursor: pointer;
+      border: none;
+      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+      font-weight: 600;
+    }
+
+    .status {
+      margin-top: 12px;
+      color: #9ca3af;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="quiz-card">
+    <h1>AI Quiz Generator</h1>
+    <p>Choose a topic, difficulty, and quiz size. One click will open the interactive test page.</p>
+
+    <div class="controls">
+      <input id="topicInput" type="text" placeholder="Topic (e.g. JavaScript, AI, Space)" />
+      <select id="countSelect">
+        <option value="10">10 questions</option>
+        <option value="20">20 questions</option>
+        <option value="50">50 questions</option>
+        <option value="100">100 questions</option>
+      </select>
+      <select id="difficultySelect">
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="expert">Expert</option>
+      </select>
+      <button id="startBtn" type="button">Start Quiz</button>
+    </div>
+
+    <div class="status" id="statusText">Ready to start your quiz.</div>
+  </div>
+
+  <script>
+    const topicInput = document.getElementById('topicInput');
+    const countSelect = document.getElementById('countSelect');
+    const difficultySelect = document.getElementById('difficultySelect');
+    const startBtn = document.getElementById('startBtn');
+    const statusText = document.getElementById('statusText');
+
+    startBtn.addEventListener('click', () => {
+      const topic = topicInput.value.trim() || 'web development';
+      const count = countSelect.value;
+      const difficulty = difficultySelect.value;
+      const targetUrl = `/test?topic=${encodeURIComponent(topic)}&count=${count}&difficulty=${difficulty}`;
+      window.location.href = targetUrl;
+    });
+  </script>
+</body>
+
+</html>

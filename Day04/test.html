@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz Test</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a, #111827);
+      color: #f9fafb;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .quiz-card {
+      width: min(92vw, 620px);
+      margin: 0 auto;
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+
+    .meta {
+      color: #9ca3af;
+      margin-bottom: 14px;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #374151;
+      background: #1f2937;
+      cursor: pointer;
+    }
+
+    .option input {
+      accent-color: #8b5cf6;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 14px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .status {
+      margin-top: 10px;
+      color: #9ca3af;
+      font-size: 0.95rem;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      place-items: center;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .modal.show {
+      display: grid;
+    }
+
+    .modal-box {
+      width: min(90vw, 420px);
+      background: #111827;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .modal-box h2 {
+      margin-bottom: 10px;
+    }
+
+    .modal-box p {
+      color: #d1d5db;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="quiz-card">
+    <h1 id="quizTitle">Quiz Test</h1>
+    <div class="meta" id="quizMeta">Loading quiz...</div>
+    <div id="questionText">Preparing questions...</div>
+    <div class="options" id="optionsContainer"></div>
+    <div class="actions">
+      <button id="submitBtn" type="button">Submit Answer</button>
+    </div>
+    <div class="status" id="statusText">Starting quiz...</div>
+  </div>
+
+  <div class="modal" id="resultModal" aria-hidden="true">
+    <div class="modal-box">
+      <h2 id="modalTitle">Result</h2>
+      <p id="modalMessage">Choose an answer and submit.</p>
+      <button id="closeModalBtn" type="button">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const topic = params.get('topic') || 'web development';
+    const count = params.get('count') || '10';
+    const difficulty = params.get('difficulty') || 'medium';
+
+    const quizTitle = document.getElementById('quizTitle');
+    const quizMeta = document.getElementById('quizMeta');
+    const questionText = document.getElementById('questionText');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusText = document.getElementById('statusText');
+    const resultModal = document.getElementById('resultModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMessage = document.getElementById('modalMessage');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    let quizQuestions = [];
+    let currentIndex = 0;
+    let correctAnswers = 0;
+    let answered = 0;
+    let submitted = false;
+    let timerId = null;
+    let timeLeft = 0;
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function showModal(title, message) {
+      modalTitle.textContent = title;
+      modalMessage.textContent = message;
+      resultModal.classList.add('show');
+      resultModal.setAttribute('aria-hidden', 'false');
+    }
+
+    function startTimer(limit) {
+      clearInterval(timerId);
+      timeLeft = limit;
+      timerId = setInterval(() => {
+        timeLeft -= 1;
+        statusText.textContent = `Question ${currentIndex + 1} of ${quizQuestions.length} • Time left: ${formatTime(timeLeft)}`;
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          showModal('Time is up', `You answered ${answered} out of ${quizQuestions.length} questions.`);
+          submitBtn.disabled = true;
+        }
+      }, 1000);
+    }
+
+    function renderQuestion() {
+      if (!quizQuestions.length) return;
+      if (currentIndex >= quizQuestions.length) {
+        clearInterval(timerId);
+        showModal('Quiz complete', `You scored ${correctAnswers} out of ${quizQuestions.length}.`);
+        statusText.textContent = `Completed ${quizQuestions.length} questions with ${correctAnswers} correct answers.`;
+        submitBtn.disabled = true;
+        return;
+      }
+      const currentQuiz = quizQuestions[currentIndex];
+      questionText.textContent = `${currentIndex + 1}. ${currentQuiz.question}`;
+      optionsContainer.innerHTML = '';
+      currentQuiz.options.forEach((option) => {
+        const label = document.createElement('label');
+        label.className = 'option';
+        label.innerHTML = `<input type="radio" name="answer" value="${option}" /> <span>${option}</span>`;
+        optionsContainer.appendChild(label);
+      });
+      statusText.textContent = `Question ${currentIndex + 1} of ${quizQuestions.length} • Time left: ${formatTime(timeLeft)}`;
+      submitted = false;
+      submitBtn.textContent = 'Submit Answer';
+      submitBtn.disabled = false;
+    }
+
+    async function loadQuiz() {
+      quizTitle.textContent = `Quiz: ${topic}`;
+      quizMeta.textContent = `Difficulty: ${difficulty} • Questions: ${count}`;
+      statusText.textContent = 'Generating quiz...';
+      try {
+        const response = await fetch(`/api/quiz?topic=${encodeURIComponent(topic)}&count=${count}&difficulty=${difficulty}`);
+        const payload = await response.json();
+        quizQuestions = payload.questions || [];
+        startTimer(payload.timeLimitSeconds || 300);
+        renderQuestion();
+      } catch (error) {
+        console.error(error);
+        statusText.textContent = 'Unable to load quiz. Please return to the home page and try again.';
+      }
+    }
+
+    submitBtn.addEventListener('click', () => {
+      if (!quizQuestions.length) return;
+      if (!submitted) {
+        const selected = document.querySelector('input[name="answer"]:checked');
+        if (!selected) {
+          showModal('Oops!', 'Please choose an answer first.');
+          return;
+        }
+        const currentQuiz = quizQuestions[currentIndex];
+        const isCorrect = selected.value === currentQuiz.correctAnswer;
+        answered += 1;
+        if (isCorrect) correctAnswers += 1;
+        submitted = true;
+        submitBtn.textContent = 'Next Question';
+        showModal(isCorrect ? 'Correct!' : 'Not quite', `${isCorrect ? 'That is right.' : `The correct answer is "${currentQuiz.correctAnswer}".`} ${currentQuiz.explanation}`);
+      } else {
+        currentIndex += 1;
+        renderQuestion();
+      }
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      resultModal.classList.remove('show');
+      resultModal.setAttribute('aria-hidden', 'true');
+    });
+
+    resultModal.addEventListener('click', (event) => {
+      if (event.target === resultModal) {
+        resultModal.classList.remove('show');
+        resultModal.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    loadQuiz();
+  </script>
+</body>
+
+</html>
