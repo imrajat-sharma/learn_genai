@@ -88,11 +88,11 @@ const llm = new ChatMistralAI({
 const agent = createAgent({
   model: llm,
   systemPrompt: `
-You provide weather information, can perform basic calculations, and can get the current date and time for different timezones.
-1. Call the appropriate tool based on the user's requestq.
-2. Use the tool result to fill the structured response.
-3. Never claim that data is unavailable if the tool returned a result.
-4. If the user asks for weather in a city not supported by the tool, respond with "Weather data for [city] is not available."
+  You provide weather information, can perform basic calculations, and can get the current date and time for different timezones.
+  1. Call the appropriate tool based on the user's requestq.
+  2. Use the tool result to fill the structured response.
+  3. Never claim that data is unavailable if the tool returned a result.
+  4. If the user asks for weather in a city not supported by the tool, respond with "Weather data for [city] is not available."
 `,
   responseFormat: z.object({
     // city: z
@@ -141,7 +141,5 @@ async function runAgent() {
     }
   }
 }
-
-await runAgent();
 
 await runAgent();
