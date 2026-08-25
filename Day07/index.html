@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI ChatBot</title>
+    <style>
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .chat-area {
+        width: 400px;
+        height: 500px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .chat-area .chat-box {
+        display: flex;
+        margin-top: auto;
+      }
+
+      .chat-area .chat-box input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <div class="chat-area">
+      <div class="chat-box">
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button id="send-button" type="submit">Send</button>
+      </div>
+    </div>
+
+  </div>
+  <script>
+    const sendButton = document.getElementById('send-button');
+    const userInput = document.getElementById('user-input');
+
+    sendButton.addEventListener('click', () => {
+      const message = userInput.value;
+      if (message.trim() !== '') {
+        // Here you can implement the logic to send the message to the AI chatbot
+        console.log('User message:', message);
+        userInput.value = ''; // Clear the input field after sending
+      }
+    });
+
+    userInput.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        sendButton.click(); // Trigger the send button click on Enter key press
+        event.preventDefault(); // Prevent the default form submission
+        // send the text as bubble event to the AI chatbot
+        const message = userInput.value;
+        //create a bubble event to send the message to the AI chatbot
+        console.log('User message:', message);
+        //display the message in the chat area as a bubble
+
+        
+        userInput.value = ''; // Clear the input field after sending
+      }
+    });
+
+  </script>
+</body>
+</html>

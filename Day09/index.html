@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mistral AI Chatbot</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f1f5f9;
+      font-family: Arial, sans-serif;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 700px;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+    }
+
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      color: white;
+      background: #111827;
+    }
+
+    .chat-header h1 {
+      font-size: 20px;
+    }
+
+    .new-chat-btn {
+      border: none;
+      padding: 9px 14px;
+      border-radius: 8px;
+      color: #111827;
+      background: white;
+      cursor: pointer;
+    }
+
+    .new-chat-btn:hover {
+      background: #e5e7eb;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: #f8fafc;
+    }
+
+    .message {
+      max-width: 80%;
+      margin-bottom: 16px;
+      padding: 12px 15px;
+      border-radius: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .message.user {
+      margin-left: auto;
+      color: white;
+      background: #2563eb;
+      border-bottom-right-radius: 3px;
+    }
+
+    .message.bot {
+      margin-right: auto;
+      color: #111827;
+      background: #e5e7eb;
+      border-bottom-left-radius: 3px;
+    }
+
+    .message.error {
+      margin-right: auto;
+      color: #991b1b;
+      background: #fee2e2;
+    }
+
+    .typing {
+      display: none;
+      padding: 0 20px 12px;
+      color: #64748b;
+      font-size: 14px;
+      background: #f8fafc;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 10px;
+      padding: 15px;
+      border-top: 1px solid #e5e7eb;
+      background: white;
+    }
+
+    #messageInput {
+      flex: 1;
+      resize: none;
+      height: 48px;
+      padding: 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      outline: none;
+      font: inherit;
+    }
+
+    #messageInput:focus {
+      border-color: #2563eb;
+    }
+
+    #sendButton {
+      width: 90px;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      background: #2563eb;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #sendButton:hover {
+      background: #1d4ed8;
+    }
+
+    #sendButton:disabled {
+      background: #93c5fd;
+      cursor: not-allowed;
+    }
+
+    .message.bot h1,
+    .message.bot h2,
+    .message.bot h3 {
+      margin: 10px 0 6px;
+    }
+
+    .message.bot p {
+      margin: 6px 0;
+    }
+
+    .message.bot ul,
+    .message.bot ol {
+      margin: 8px 0 8px 22px;
+    }
+
+    .message.bot code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      color: #be185d;
+      background: #fce7f3;
+      font-family: monospace;
+    }
+
+    .message.bot pre {
+      overflow-x: auto;
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 8px;
+      color: #f8fafc;
+      background: #111827;
+    }
+
+    .message.bot pre code {
+      padding: 0;
+      color: #f8fafc;
+      background: transparent;
+    }
+
+    .message.bot blockquote {
+      margin: 8px 0;
+      padding-left: 12px;
+      border-left: 4px solid #94a3b8;
+      color: #475569;
+    }
+
+
+    @media (max-width: 600px) {
+      body {
+        align-items: stretch;
+      }
+
+      .chat-container {
+        height: 100vh;
+        border-radius: 0;
+      }
+
+      .message {
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="chat-container">
+    <header class="chat-header">
+      <h1>Mistral AI Chatbot</h1>
+      <button class="new-chat-btn" id="newChatButton">
+        New Chat
+      </button>
+    </header>
+
+    <main class="messages" id="messages">
+      <div class="message bot">
+        Hello! How can I help you today?
+      </div>
+    </main>
+
+    <div class="typing" id="typing">
+      AI is typing...
+    </div>
+
+    <form class="input-area" id="chatForm">
+      <textarea
+        id="messageInput"
+        placeholder="Type your message..."
+        required
+      ></textarea>
+
+      <button type="submit" id="sendButton">
+        Send
+      </button>
+    </form>
+  </div>
+
+  <script>
+  const API_URL = "http://localhost:7700/chat/stream";
+
+  const messagesContainer = document.getElementById("messages");
+  const chatForm = document.getElementById("chatForm");
+  const messageInput = document.getElementById("messageInput");
+  const sendButton = document.getElementById("sendButton");
+  const typingIndicator = document.getElementById("typing");
+  const newChatButton = document.getElementById("newChatButton");
+
+  let conversationId = localStorage.getItem("conversationId");
+
+  if (!conversationId) {
+    conversationId = crypto.randomUUID();
+    localStorage.setItem("conversationId", conversationId);
+  }
+
+  function addUserMessage(text) {
+    const element = document.createElement("div");
+
+    element.className = "message user";
+    element.textContent = text;
+
+    messagesContainer.appendChild(element);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  function addBotMessage() {
+    const element = document.createElement("div");
+
+    element.className = "message bot";
+    element.innerHTML = "";
+
+    messagesContainer.appendChild(element);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    return element;
+  }
+
+  function renderMarkdown(element, markdown) {
+    const html = marked.parse(markdown);
+
+    element.innerHTML = DOMPurify.sanitize(html);
+
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  function setLoading(isLoading) {
+    sendButton.disabled = isLoading;
+    messageInput.disabled = isLoading;
+    typingIndicator.style.display = isLoading ? "block" : "none";
+  }
+
+  async function streamResponse(message, botElement) {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message,
+        conversationId
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error("Server returned an error");
+    }
+
+    if (!response.body) {
+      throw new Error("Streaming is not supported by this browser");
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    let buffer = "";
+    let fullMarkdown = "";
+
+    while (true) {
+      const { value, done } = await reader.read();
+
+      if (done) {
+        break;
+      }
+
+      buffer += decoder.decode(value, { stream: true });
+
+      const events = buffer.split("\n\n");
+
+      // Keep the last incomplete event for the next iteration
+      buffer = events.pop();
+
+      for (const event of events) {
+        const line = event
+          .split("\n")
+          .find((line) => line.startsWith("data:"));
+
+        if (!line) {
+          continue;
+        }
+
+        const jsonText = line.replace(/^data:\s*/, "");
+        const data = JSON.parse(jsonText);
+
+        if (data.type === "chunk") {
+          fullMarkdown += data.content;
+
+          // Re-render the progressively growing Markdown response
+          renderMarkdown(botElement, fullMarkdown);
+        }
+
+        if (data.type === "error") {
+          throw new Error(data.error);
+        }
+      }
+    }
+  }
+
+  chatForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const message = messageInput.value.trim();
+
+    if (!message) {
+      return;
+    }
+
+    addUserMessage(message);
+    messageInput.value = "";
+
+    const botElement = addBotMessage();
+
+    setLoading(true);
+
+    try {
+      await streamResponse(message, botElement);
+    } catch (error) {
+      botElement.className = "message error";
+      botElement.textContent = error.message;
+    } finally {
+      setLoading(false);
+      messageInput.focus();
+    }
+  });
+
+  messageInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      chatForm.requestSubmit();
+    }
+  });
+
+  newChatButton.addEventListener("click", () => {
+    conversationId = crypto.randomUUID();
+    localStorage.setItem("conversationId", conversationId);
+
+    messagesContainer.innerHTML = `
+      <div class="message bot">
+        New conversation started. How can I help?
+      </div>
+    `;
+
+    messageInput.focus();
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+</body>
+</html>
