@@ -1,6 +1,5 @@
 import { Mistral } from "@mistralai/mistralai";
 import Config from "../config.js";
-import { config } from "dotenv";
 
 if (!Config.apiKey) {
   throw new Error("Mistral API key not found!");
@@ -22,7 +21,6 @@ async function chat(conversationId, userText){
   if(!conversations.has(conversationId)){
     conversations.set(conversationId,[])
   }
-
 
 
   const history = conversations.get(conversationId)
