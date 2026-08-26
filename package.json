@@ -10,6 +10,7 @@
   "dependencies": {
     "@langchain/core": "^1.2.1",
     "@langchain/mistralai": "^1.2.0",
+    "@mistralai/mistralai": "^2.6.4",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
