@@ -8,8 +8,6 @@ const mistral = new Mistral({ apiKey: Config.apiKey });
 
 const memories = new Map();
 
-const history = [];
-
 const systemMessage = {
   role: "system",
   content: "You are a helpful assistant, be polite and respectful.",
