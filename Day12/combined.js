@@ -9,7 +9,7 @@ const splitter = new RecursiveCharacterTextSplitter({
   chunkOverlap: 50,
 });
 
-export const chunks = await splitter.splitText(longText);
+const chunks = await splitter.splitText(longText);
 
 const apiKey = Config.apiKey;
 if (!apiKey) {

@@ -1,7 +1,7 @@
 import { MistralAIEmbeddings } from "@langchain/mistralai";
 import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
 import Config from "../config.js";
-import { chunks } from "./combined.js";
+import { chunks } from "./mistralembedding.js";
 
 
 const apiKey = Config.apiKey;
