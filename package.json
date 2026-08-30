@@ -8,6 +8,7 @@
   },
   "packageManager": "pnpm@10.33.2",
   "dependencies": {
+    "@langchain/classic": "^1.0.45",
     "@langchain/core": "^1.2.9",
     "@langchain/mistralai": "^1.2.0",
     "@langchain/textsplitters": "^1.0.1",
