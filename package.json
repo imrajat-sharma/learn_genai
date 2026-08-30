@@ -8,14 +8,15 @@
   },
   "packageManager": "pnpm@10.33.2",
   "dependencies": {
-    "@langchain/core": "^1.2.1",
+    "@langchain/core": "^1.2.9",
     "@langchain/mistralai": "^1.2.0",
+    "@langchain/textsplitters": "^1.0.1",
     "@mistralai/mistralai": "^2.6.4",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "langchain": "^1.5.2",
-    "pnpm": "^11.23.0",
-    "zod": "^4.4.3"
+    "langchain": "^1.5.10",
+    "pnpm": "^11.24.0",
+    "zod": "^4.5.4"
   }
 }
