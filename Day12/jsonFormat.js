@@ -39,6 +39,6 @@ The JSON must contain:
 const result = JSON.parse(response.choices[0].message.content);
 console.log(result);
 
-//Validation
+//Zod Validation
 const ticket = TicketSchema.parse(result);
 console.log(ticket);
